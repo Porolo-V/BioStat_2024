@@ -1,0 +1,8 @@
+"0","data %>% "
+"0","  rowwise() %>% "
+"0","  mutate(`Среднее по базофилам` = mean(c_across(contains('Базофилы')))) %>%"
+"0","  ungroup() %>%"
+"0","  select(contains('Базофил'))"
+"2","Ошибка в UseMethod(""rowwise"") : 
+  нет подходящего метода для 'rowwise' применяемого к объекту класса ""function""
+"

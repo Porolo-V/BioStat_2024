@@ -1,0 +1,4 @@
+"0",""
+"0","#5 tidyr::na_if(), tidyr::replace_na()"
+"0",""
+"0","data %>% mutate(`Группа крови` = `Группа крови` %>% as.character() %>% replace_na('Нет данных') %>% as.factor())"

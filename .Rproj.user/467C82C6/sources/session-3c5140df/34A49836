@@ -1,0 +1,33 @@
+{
+    "id": "34A49836",
+    "path": "~/course_stat/Introduction_to_Data_Processing_Automation_in_R.Rmd",
+    "project_path": "Introduction_to_Data_Processing_Automation_in_R.Rmd",
+    "type": "r_markdown",
+    "hash": "2850613135",
+    "contents": "",
+    "dirty": false,
+    "created": 1724836366389.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "25,0",
+        "scrollLine": "0",
+        "rmdVisualMode": "false",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "607:419",
+        "rmdVisualWrapConfigured": "true",
+        "docOutlineVisible": "1",
+        "docOutlineSize": "76",
+        "last_setup_crc32": "3c5140dfb9b6a4e9"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1725810991,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1725810991908,
+    "read_only": false,
+    "read_only_alternatives": []
+}
