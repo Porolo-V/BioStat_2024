@@ -10,69 +10,66 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 
+theme_custom <- theme(
+    panel.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 10, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5),
+    strip.text = element_text(size = 15),
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 15),
+    legend.title = element_text(size = 15),
+    legend.text = element_text(size = 15)
+  )
 ```
 
-## Модель пациента: исследование прироста гемоглобина
+```{r task4}
 
-```{r pressure, echo=FALSE}
+true_p_values <- seq(0, 1, by = 0.1) 
+n_patients_values <- seq(5, 105, by = 10)  
 
-true_p <- 0.6  # Истинная вероятность исцеления
+n_repeats <- 1000  
 
+estimate_error <- function(n_patients, true_p, n_repeats) {
+  outcomes <- replicate(n_repeats, {
+    sample <- rbinom(n_patients, size = 1, prob = true_p)  
+    sample_mean <- mean(sample)
+    return(sample_mean)
+  })
+
+  se <- mean((outcomes - true_p)^2)
+  return(se)
+}
+
+results <- data.frame(true_p = numeric(), n_patients = numeric(), se = numeric())
+
+
+for (true_p in true_p_values) {
+  for (n_patients in n_patients_values) {
+    se <- estimate_error(n_patients, true_p, n_repeats)
+    results <- rbind(results, data.frame(true_p = true_p, n_patients = n_patients, se = se))
+  }
+}
+
+
+ggplot(results, aes(x = n_patients, 
+                    y = se, 
+                    color = as.factor(true_p))
+       ) +
+  geom_line(size = 1.5) +
+  theme_custom +
+scale_color_manual(
+    values = c("red", "blue", "green", "yellow", "black", "grey", "purple", "orange", "brown", "cyan", "pink")
+  ) +
+  labs(
+    x = "Размер выборки",
+    y = "Среднеквадратическая ошибка - SE",
+    color = "Истинная вероятность"
+  )
 ```
 
-## Однократная оценка по выборке
+*Вывод:*
+С увеличением количества наблюдений в выборке средняя квадратическая ошибка уменьшается, что делает оценку вероятности более точной. При вероятности 0.5 результаты сильно колеблются — мы можем получить много нулей и единиц, что приводит к большому разбросу и большей SE по всей длине графика. А при вероятностях, близких к 0 или 1, результаты стабильнее, и мы почти всегда видим одно и то же значение.
 
-```{r sample_1}
-n_patients <- 5  # Количество добровольцев 
-
-group_recovery <- rbinom(n_patients, 1, true_p) # Генерация данных (исцеление — 1, не исцеление — 0)
-
-print(group_recovery)
-
-sample_p <- mean(group_recovery)
-
-print(sample_p)
-
-```
-
-## Набираем статистику
-
-```{r sample_n}
-n_patients <- 5  # Количество добровольцев
-
-n_repeats <- 1000  # Количество повторений эксперимента
-
-df_all_repeats <- data.frame(
-  n_exp = rep(1:n_repeats, each = n_patients),
-  ID = rep(1:n_patients, n_repeats),
-  recovery = rbinom(n_repeats * n_patients, 1, true_p)
-)
-
-```
-
-## Оценка среднего в каждом эксперименте
-
-```{r estimations}
-
-df_sample_mean <- df_all_repeats %>% 
-  group_by(n_exp) %>% 
-  dplyr::summarise(mean_recovery = mean(recovery)) %>% 
-  ungroup()
-
-ggplot(df_sample_mean, aes(x = mean_recovery)) +
-  geom_histogram(color = 'black', fill = 'white', binwidth = 0.2) +
-  theme_bw()
-
-```
-
-## Количественные и качественные итоги
-
-```{r conclusions}
-
-error <- sqrt( mean((df_sample_mean$mean_recovery-true_p)^2) )
-print(error)
-
-```
 
 
 
