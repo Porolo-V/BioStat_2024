@@ -390,9 +390,9 @@ theme_custom2 <- theme(
     axis.title = element_text(size = 12),
     legend.title = element_text(size = 15),
     legend.text = element_text(size = 11),
-    legend.position = "right",  # Позиция легенды
-    legend.box = "horizontal",    # Горизонтальная легенда
-    plot.margin = margin(10, 35, 10, 10)  # Отступы вокруг графиков
+    legend.position = "right",  
+    legend.box = "horizontal",    
+    plot.margin = margin(10, 35, 10, 10)  
 )
 
 exam_scores_long <- hogwarts %>%
