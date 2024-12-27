@@ -1,0 +1,99 @@
+---
+title: "ADam like"
+author: "Porolo Viktoria"
+date: "2024-12-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(openxlsx)
+
+setwd("C:/Users/vtish/Desktop/Biostat2024/ADaM Coding")
+```
+
+
+```{r}
+
+ADSL <- read.xlsx("./ADaM-like/ADSL.xlsx")
+MH_medhis <- read.xlsx("./SDTM/MH_MEDICALHISTORY.xlsx")
+
+```
+
+
+```{r}
+ADSL_j <- ADSL %>%
+  mutate(
+    STUDYID = as.character(STUDYID), 
+    USUBJID = as.character(USUBJID),
+    TRTP = as.character(TRTP),
+    TRTPN = as.numeric(TRTPN)
+  ) %>%
+  select(STUDYID, USUBJID, TRTP, TRTPN)
+
+```
+
+
+
+```{r}
+#ф-ция преобразование дат
+as_date <- function(date_string) {
+  ifelse(
+    nchar(date_string) == 4, paste0(date_string, "-01-01"),
+    ifelse(nchar(date_string) == 7, paste0(date_string, "-01"), date_string)
+  ) %>%
+    as.Date()
+}
+
+```
+
+```{r}
+MH_medhis_j <- MH_medhis %>%
+  filter(!is.na(MHTERM) & MHCAT == "Medical History") %>%
+  mutate(
+    USUBJID = paste(STUDYID, SUBJID, sep = '-'),
+    MHSEQ = as.numeric(MHSEQ),
+    MHCAT = as.character(MHCAT),
+    MHTERM = as.character(MHTERM),
+    MHDECOD = as.character(MHDECOD),
+    MHBODSYS = as.character(MHBODSYS),
+    MHSTDTC = as.character(MHSTDTC),
+    ASTDT = format(as_date(MHSTDTC), "%d.%m.%Y"),
+    ASTDTF = case_when(
+      nchar(MHSTDTC) < 4 | is.na(MHSTDTC) ~ "Y", 
+      nchar(MHSTDTC) == 4 ~ "M", 
+      nchar(MHSTDTC) == 7 ~ "D",   
+      TRUE ~ NA_character_
+    ),
+    MHENDTC = as.character(MHENDTC), 
+    AENDT = ifelse(MHENRTPT == "ONGOING", "ONGOING", ""),
+    AENDTF = case_when(
+      nchar(MHENDTC) < 4 | is.na(MHENDTC) ~ "Y", 
+      nchar(MHENDTC) == 4 ~ "M", 
+      nchar(MHENDTC) == 7 ~ "D",   
+      TRUE ~ NA_character_
+    ),
+    MHENRTPT = as.character(MHENRTPT), 
+    MHENRF = ifelse(MHENRTPT == "ONGOING", MHENRTPT, NA_character_)
+  ) %>%
+  select(
+    USUBJID, MHSEQ, MHCAT, MHTERM, MHDECOD, MHBODSYS, MHSTDTC, 
+    ASTDT, ASTDTF, MHENDTC, AENDT, AENDTF, MHENRTPT, MHENRF
+  )
+
+
+```
+
+
+```{r }
+#сборка и сохранение 
+ADMH <- left_join(ADSL_j, MH_medhis_j, by = join_by(USUBJID))
+
+
+#ADMH <- left_join(ADSL_j, MH_medhis_j, by = join_by(USUBJID)) %>% - Альтернативный вариант, если нам нужны не все субъекты, а только с заболеваниями в анамнезе 
+#  filter(!if_all(-c(STUDYID, USUBJID, TRTP, TRTPN), is.na))
+
+write.xlsx(ADMH, "./ADaM-like/ADMH.xlsx")
+```
